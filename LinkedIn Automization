@@ -1,0 +1,62 @@
+from selenium import webdriver
+from time import sleep
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
+from info import e_mail, passwords
+
+
+class Linkedin_Bot():
+    def __init__(self):
+        self.driver = webdriver.Chrome()
+        self.driver.maximize_window()
+
+    def login(self):
+        self.driver.get("https://tr.linkedin.com/")
+
+        email = self.driver.find_element_by_xpath('//*[@id="session_key"]')
+        email.send_keys(e_mail)
+
+        password = self.driver.find_element_by_xpath('//*[@id="session_password"]')
+        password.send_keys(passwords)
+
+        wait = WebDriverWait(self.driver, 10)
+        log_button = wait.until(lambda driver: self.driver.find_element_by_xpath('/html/body/main/section[1]/div[2]/form/button'))
+        log_button.click()
+
+    def linkedin_bot(self):
+        wait = WebDriverWait(self.driver, 10)
+        search_bar = wait.until(lambda driver: self.driver.find_element_by_xpath('//*[@id="ember20"]/input'))
+        search_bar.send_keys("#python")
+        search_bar.send_keys(Keys.RETURN)
+
+        wait = WebDriverWait(self.driver, 10)
+        contacts = wait.until(lambda driver: self.driver.find_element_by_xpath("//*[@id='ember24']"))
+        contacts.click()
+
+        wait = WebDriverWait(self.driver, 30)
+        contact_button = wait.until(lambda driver: self.driver.find_element_by_id("ember380"))
+        contact_button.click()
+
+        wait = WebDriverWait(self.driver, 10)
+        close_chat = wait.until(lambda driver: self.driver.find_element_by_xpath('//*[@id="ember307"]'))
+        close_chat.click()
+
+        for i in range(1,3):
+            self.driver.execute_script('window.scrollTo(0,document.body.scrollHeight)')
+
+        wait = WebDriverWait(self.driver, 20)
+        followers = wait.until(lambda driver: self.driver.find_elements_by_class_name("mn-connection-card__details"))
+        fallower_list=[]
+
+        for follower in followers:
+            fallower_list.append(follower.text)
+
+        with open ("follower.txt", "w", encoding = "UTF-8") as file:
+            for follower in fallower_list:
+                file.write(follower + "\n")
+
+        self.driver.quit()
+
+bot = Linkedin_Bot()
+bot.login()
+bot.linkedin_bot()
